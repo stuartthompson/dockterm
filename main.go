@@ -19,6 +19,7 @@ package main
 
 import (
 	"github.com/nsf/termbox-go"
+	"github.com/stuartthompson/dockterm/screens"
 )
 
 type DisplayScreen int
@@ -28,42 +29,19 @@ const (
 	AboutScreen
 )
 
-func drawBackground(bgColor termbox.Attribute) {
-	termbox.Clear(0, bgColor)
-}
-
 func drawScreen(screen DisplayScreen) {
 	switch screen {
 	case MainScreen:
-		drawMainScreen()
+		screens.RenderMainScreen()
 	case AboutScreen:
-		drawAboutScreen()
+		screens.RenderAboutScreen()
 	}
-}
-
-func drawMainScreen() {
-	drawBackground(termbox.Attribute(1))
-	termbox.SetCell(10, 0, 'M', termbox.Attribute(80), termbox.Attribute(125))
-	termbox.SetCell(11, 0, 'a', termbox.Attribute(80), termbox.Attribute(1))
-	termbox.SetCell(12, 0, 'i', termbox.Attribute(80), termbox.Attribute(1))
-	termbox.SetCell(13, 0, 'n', termbox.Attribute(80), termbox.Attribute(1))
-	termbox.Flush()
-}
-
-func drawAboutScreen() {
-	drawBackground(termbox.Attribute(1))
-	termbox.SetCell(10, 0, 'A', termbox.Attribute(80), termbox.Attribute(1))
-	termbox.SetCell(11, 0, 'b', termbox.Attribute(80), termbox.Attribute(1))
-	termbox.SetCell(12, 0, 'o', termbox.Attribute(80), termbox.Attribute(1))
-	termbox.SetCell(13, 0, 'u', termbox.Attribute(80), termbox.Attribute(1))
-	termbox.SetCell(14, 0, 't', termbox.Attribute(80), termbox.Attribute(1))
-	termbox.Flush()
 }
 
 func mainLoop() {
 	var displayScreen DisplayScreen
 	displayScreen = MainScreen
-	drawMainScreen()
+	drawScreen(displayScreen)
 	for {
 		event := termbox.PollEvent()
 		if event.Type == termbox.EventKey {
@@ -96,8 +74,6 @@ func main() {
 	}
 
 	defer termbox.Close()
-
-	termbox.SetOutputMode(termbox.Output256)
 
 	mainLoop()
 }
