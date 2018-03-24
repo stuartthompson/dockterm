@@ -30,5 +30,6 @@ type AboutScreen struct {
 func (s *AboutScreen) Render() {
 	io.ClearScreen(0)
 	io.RenderText("About", 1, 1, 255, 0)
+	io.RenderText("A docker management app for the terminal.", 1, 3, 255, 0)
 	io.Flush()
 }
