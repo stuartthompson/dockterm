@@ -18,17 +18,23 @@
 package main
 
 import (
+	termbox "github.com/nsf/termbox-go"
 	"github.com/stuartthompson/dockterm/io"
 	"github.com/stuartthompson/dockterm/screens"
 )
 
+// Screen ...
+// Typedef for screen types.
 type Screen int
 
+// Defines screen types.
 const (
 	MainScreen = iota
 	AboutScreen
 )
 
+// App ...
+// Encapsulate main application logic.
 type App struct {
 	isRunning     bool
 	eventListener *io.EventListener
@@ -37,7 +43,9 @@ type App struct {
 	aboutScreen   *screens.AboutScreen
 }
 
-func InitApp() *App {
+// NewApp ...
+// Initializes the application.
+func NewApp() *App {
 	app := &App{
 		isRunning:   true,
 		mainScreen:  &screens.MainScreen{},
@@ -48,16 +56,31 @@ func InitApp() *App {
 	return app
 }
 
+// Run ...
+// Runs the application.
 func (a *App) Run() {
-	io.Init()
+	// Initialize termbox
+	err := termbox.Init()
+	if err != nil {
+		panic(err)
+	}
+	defer termbox.Close()
+
+	// Register keypress handlers
 	a.registerKeypressHandlers()
+
+	// Render screen (initially)
 	a.Render()
+
+	// Start main app loop
 	for a.isRunning {
 		a.eventListener.WaitForEvent()
 		a.Render()
 	}
 }
 
+// Render ...
+// Renders the current screen.
 func (a *App) Render() {
 	switch a.currentScreen {
 	case MainScreen:

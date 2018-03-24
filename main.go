@@ -17,21 +17,6 @@
 
 package main
 
-import (
-	"github.com/nsf/termbox-go"
-)
-
 func main() {
-	var err error
-
-	err = termbox.Init()
-	if err != nil {
-		panic(err)
-	}
-
-	defer termbox.Close()
-
-	// Initialize application
-	app := InitApp()
-	app.Run()
+	NewApp().Run()
 }
