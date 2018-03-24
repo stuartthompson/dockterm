@@ -19,51 +19,7 @@ package main
 
 import (
 	"github.com/nsf/termbox-go"
-	"github.com/stuartthompson/dockterm/screens"
 )
-
-type DisplayScreen int
-
-const (
-	MainScreen = iota
-	AboutScreen
-)
-
-func drawScreen(screen DisplayScreen) {
-	switch screen {
-	case MainScreen:
-		screens.RenderMainScreen()
-	case AboutScreen:
-		screens.RenderAboutScreen()
-	}
-}
-
-func mainLoop() {
-	var displayScreen DisplayScreen
-	displayScreen = MainScreen
-	drawScreen(displayScreen)
-	for {
-		event := termbox.PollEvent()
-		if event.Type == termbox.EventKey {
-			if event.Ch == '?' {
-				if displayScreen == AboutScreen {
-					displayScreen = MainScreen
-				} else {
-					displayScreen = AboutScreen
-				}
-			}
-			if event.Ch == 'q' {
-				break
-			}
-
-			drawScreen(displayScreen)
-		}
-		if event.Type == termbox.EventResize {
-			drawScreen(displayScreen)
-		}
-
-	}
-}
 
 func main() {
 	var err error
@@ -75,5 +31,7 @@ func main() {
 
 	defer termbox.Close()
 
-	mainLoop()
+	// Initialize application
+	app := InitApp()
+	app.Run()
 }
