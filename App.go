@@ -64,6 +64,7 @@ func (a *App) Run() {
 	if err != nil {
 		panic(err)
 	}
+	termbox.SetOutputMode(termbox.Output256)
 	defer termbox.Close()
 
 	// Register keypress handlers

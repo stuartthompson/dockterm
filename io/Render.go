@@ -21,12 +21,6 @@ import (
 	"github.com/nsf/termbox-go"
 )
 
-// Init ...
-// Initializes output.
-func Init() {
-	termbox.SetOutputMode(termbox.Output256)
-}
-
 // ClearScreen ...
 // Clears the screen using a specified color.
 func ClearScreen(bgColor int) {
