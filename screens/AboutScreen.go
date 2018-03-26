@@ -30,7 +30,7 @@ type AboutScreen struct {
 func (s *AboutScreen) Render() {
 	io.ClearScreen(0)
 	width, height := io.GetWindowSize()
-	io.RenderPaneBorder(0, 0, width - 1, height - 1, 213, 0)
+	io.RenderPaneBorder(0, 0, width - 1, height - 1, 212, 0)
 	io.RenderText("About", 1, 1, 255, 0)
 	io.RenderText("Dockterm is a docker management app.", 1, 3, 255, 0)
 	io.Flush()
