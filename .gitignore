@@ -1,2 +1,6 @@
 # Build artifact
 dockterm
+
+# VSCode Files
+.vscode
+debug
