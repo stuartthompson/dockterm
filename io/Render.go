@@ -18,15 +18,18 @@
 package io
 
 import (
+	"unicode/utf8"
+
 	"github.com/nsf/termbox-go"
 )
 
+// Characters for rendering the border runes
 const (
-	BorderRuneHorizontal = rune('\u2550')
-	BorderRuneVertical = rune('\u2551')
-	BorderRuneCornerTopLeft = rune('\u2554')
-	BorderRuneCornerTopRight = rune('\u2557')
-	BorderRuneCornerBottomLeft = rune('\u255A')
+	BorderRuneHorizontal        = rune('\u2550')
+	BorderRuneVertical          = rune('\u2551')
+	BorderRuneCornerTopLeft     = rune('\u2554')
+	BorderRuneCornerTopRight    = rune('\u2557')
+	BorderRuneCornerBottomLeft  = rune('\u255A')
 	BorderRuneCornerBottomRight = rune('\u255D')
 )
 
@@ -42,6 +45,8 @@ func Flush() {
 	termbox.Flush()
 }
 
+// GetWindowSize ...
+// Gets the current dimensions of the terminal.
 func GetWindowSize() (width int, height int) {
 	return termbox.Size()
 }
@@ -51,31 +56,45 @@ func GetWindowSize() (width int, height int) {
 func RenderPaneBorder(x int, y int, width int, height int, fgColor int, bgColor int) {
 	// Render the corners
 	termbox.SetCell(x, y, BorderRuneCornerTopLeft, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
-	termbox.SetCell(x + width, y, BorderRuneCornerTopRight, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
-	termbox.SetCell(x, y + height, BorderRuneCornerBottomLeft, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
-	termbox.SetCell(x + width, y + height, BorderRuneCornerBottomRight, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
+	termbox.SetCell(x+width, y, BorderRuneCornerTopRight, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
+	termbox.SetCell(x, y+height, BorderRuneCornerBottomLeft, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
+	termbox.SetCell(x+width, y+height, BorderRuneCornerBottomRight, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
 	// Render top border
 	for ix := 1; ix < width; ix++ {
-		termbox.SetCell(x + ix, y, BorderRuneHorizontal, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
+		termbox.SetCell(x+ix, y, BorderRuneHorizontal, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
 	}
 	// Render bottom border
 	for ix := 1; ix < width; ix++ {
-		termbox.SetCell(x + ix, y + height, BorderRuneHorizontal, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
+		termbox.SetCell(x+ix, y+height, BorderRuneHorizontal, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
 	}
 	// Render left border
 	for iy := 1; iy < height; iy++ {
-		termbox.SetCell(x, y + iy, BorderRuneVertical, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
+		termbox.SetCell(x, y+iy, BorderRuneVertical, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
 	}
 	// Render right border
 	for iy := 1; iy < height; iy++ {
-		termbox.SetCell(x + width, y + iy, BorderRuneVertical, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
+		termbox.SetCell(x+width, y+iy, BorderRuneVertical, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
 	}
 }
 
 // RenderText ...
 // Renders a string at specific coordinates using the supplied colors.
 func RenderText(text string, x int, y int, fgColor int, bgColor int) {
-	for i := 0; i < len(text); i++ {
-		termbox.SetCell(x+i, y, rune(text[i]), termbox.Attribute(fgColor), termbox.Attribute(bgColor))
+	// Get the text to render as a byte array
+	bytes := []byte(text)
+
+	// Initialize terminal column index
+	colIx := x
+
+	// Loop through the bytes in the slice
+	for bIx := 0; bIx < len(bytes); {
+		// Decode the next rune in the string
+		r, size := utf8.DecodeRune(bytes[bIx:])
+		// Set the cell value to that of the decoded rune
+		termbox.SetCell(colIx, y, r, termbox.Attribute(fgColor), termbox.Attribute(bgColor))
+		// Advance the index by the size of the rune just decoded (some runes use multiple bytes)
+		bIx += size
+		// Increment the terminal column index (one column per rune rendered)
+		colIx++
 	}
 }
