@@ -21,6 +21,7 @@ import (
 	"log"
 	"os/exec"
 	"strings"
+
 	"github.com/stuartthompson/dockterm/io"
 )
 
@@ -33,14 +34,14 @@ type MainScreen struct {
 func (s *MainScreen) Render() {
 	io.ClearScreen(0)
 	width, height := io.GetWindowSize()
-	io.RenderPaneBorder(0, 0, width - 1, height - 1, 82, 0)
+	io.RenderPaneBorder(0, 0, width-1, height-1, 82, 0)
 	io.RenderText("Main", 1, 1, 255, 0)
 
 	// List running containers
 	ctrs := s.getRunningContainers()
 	ctrList := strings.Split(ctrs, "\n")
 	for ix, ctr := range ctrList {
-		io.RenderText(ctr, 1, 3 + ix, 255, 0)
+		io.RenderText(ctr, 1, 3+ix, 255, 0)
 	}
 	io.Flush()
 }
