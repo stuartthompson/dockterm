@@ -38,10 +38,9 @@ func (s *MainScreen) Render() {
 	io.RenderText("Main", 1, 1, 255, 0)
 
 	// List running containers
-	ctrs := s.getRunningContainers()
-	ctrList := strings.Split(ctrs, "\n")
-	for ix, ctr := range ctrList {
-		io.RenderText(ctr, 1, 3+ix, 255, 0)
+	ctrIds := s.getRunningContainerIds()
+	for ix, ctrID := range ctrIds {
+		io.RenderText(ctrID, 1, 3+ix, 255, 0)
 	}
 	io.Flush()
 }
@@ -52,4 +51,23 @@ func (s *MainScreen) getRunningContainers() string {
 		log.Fatal(err)
 	}
 	return string(output)
+}
+
+func (s *MainScreen) getRunningContainerIds() []string {
+	ctrs := s.getRunningContainers()
+	// Strip trailing LF
+	ctrs = ctrs[0 : len(ctrs)-1]
+	// Split on LF
+	ctrList := strings.Split(ctrs, "\n")
+	var ids []string
+	for ix, ctr := range ctrList {
+		var ctrID string
+		if len(ctr) >= 10 {
+			ctrID = ctr[0:9]
+		} else {
+			log.Printf("Unable to parse container ID '%s' at index %d", ctr, ix)
+		}
+		ids = append(ids, ctrID)
+	}
+	return ids
 }
