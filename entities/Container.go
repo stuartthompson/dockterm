@@ -38,3 +38,26 @@ type ContainerState struct {
 	StartedAt  string
 	EndedAt    string
 }
+
+// Config ...
+// Represents the config for a Docker container.
+type Config struct {
+	Hostname     string
+	Domainname   string
+	User         string
+	AttachStdin  bool
+	AttachStdout bool
+	AttachStderr bool
+	Tty          bool
+	OpenStdin    bool
+	StdinOnce    bool
+	Env          []string
+	Cmd          []string
+	ArgsEscaped  bool
+	Image        string
+	//Volumes    ??
+	WorkingDir string
+	//Entrypoint ??
+	//OnBuild    ??
+	Labels []string
+}
