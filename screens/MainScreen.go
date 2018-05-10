@@ -18,10 +18,12 @@
 package screens
 
 import (
+	"encoding/json"
 	"log"
 	"os/exec"
 	"strings"
 
+	"github.com/stuartthompson/dockterm/entities"
 	"github.com/stuartthompson/dockterm/io"
 )
 
@@ -37,37 +39,67 @@ func (s *MainScreen) Render() {
 	io.RenderPaneBorder(0, 0, width-1, height-1, 82, 0)
 	io.RenderText("Main", 1, 1, 255, 0)
 
-	// List running containers
-	ctrIds := s.getRunningContainerIds()
-	for ix, ctrID := range ctrIds {
-		io.RenderText(ctrID, 1, 3+ix, 255, 0)
+	// Render headers
+	io.RenderText("Container Id", 1, 3, 255, 0)
+	io.RenderText("Running", 14, 3, 255, 0)
+
+	// Render container details
+	containers := s.getRunningContainers()
+	for ix, container := range containers {
+		shortID := container.ID[0:12]
+		running := "No"
+		if container.State.Running {
+			running = "Yes"
+		}
+		io.RenderText(shortID, 1, 4+ix, 255, 0)
+		io.RenderText(running, 14, 4+ix, 255, 0)
 	}
 	io.Flush()
 }
 
-func (s *MainScreen) getRunningContainers() string {
-	output, err := exec.Command("/usr/bin/docker", "ps", "-a").Output()
+// getRunningContainers ...
+// Gets the list of containers running on this machine.
+func (s *MainScreen) getRunningContainers() []*entities.Container {
+	output, err := exec.Command("docker", "ps", "-a").Output()
 	if err != nil {
 		log.Fatal(err)
 	}
-	return string(output)
-}
 
-func (s *MainScreen) getRunningContainerIds() []string {
-	ctrs := s.getRunningContainers()
-	// Strip trailing LF
+	ctrs := string(output)
+
+	// Strip trailing LF (to avoid parsing an empty line at the end)
 	ctrs = ctrs[0 : len(ctrs)-1]
 	// Split on LF
 	ctrList := strings.Split(ctrs, "\n")
-	var ids []string
+	// Iterate through the lines and build container descriptions
+	var containers []*entities.Container
 	for ix, ctr := range ctrList {
-		var ctrID string
-		if len(ctr) >= 10 {
-			ctrID = ctr[0:9]
-		} else {
-			log.Printf("Unable to parse container ID '%s' at index %d", ctr, ix)
+		if ix == 0 {
+			continue
 		}
-		ids = append(ids, ctrID)
+		// Split on tab
+		ctrID := ctr[0:9]
+		container := s.getContainerDetails(ctrID)
+		containers = append(containers, container)
 	}
-	return ids
+	// Parse container id
+	return containers
+}
+
+// getContainerDetails ...
+// Gets the details for a running Docker container.
+func (s *MainScreen) getContainerDetails(ctrID string) *entities.Container {
+	output, err := exec.Command("docker", "inspect", ctrID).Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Parse the output
+	var container []entities.Container
+	err = json.Unmarshal([]byte(output), &container)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &container[0]
 }
